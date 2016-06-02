@@ -1,4 +1,4 @@
-package org.springframework.data.crate;
+package org.springframework.data.crate.integration;
 
 import io.crate.testing.CrateTestCluster;
 import io.crate.testing.CrateTestServer;
@@ -11,18 +11,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class CrateIntegrationTest {
+public abstract class CrateBaseIntegrationTest {
 
     private static final String CRATE_SERVER_VERSION = clientVersion();
-    protected static CrateTestServer server;
+    static CrateTestServer server;
 
     private static String clientVersion() {
         String cp = System.getProperty("java.class.path");
         Matcher m = Pattern.compile("crate-client-([\\d\\.]{5,})\\.jar").matcher(cp);
 
         if (m.find()) {
-            String version = m.group(1);
-            return version;
+            return m.group(1);
         }
         throw new RuntimeException("unable to get version of crate-client");
     }

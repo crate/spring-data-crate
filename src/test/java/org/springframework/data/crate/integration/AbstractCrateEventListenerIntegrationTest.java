@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.springframework.data.crate.core.mapping.event;
+package org.springframework.data.crate.integration;
 
 import static org.junit.Assert.assertEquals;
 
@@ -25,7 +25,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.crate.CrateIntegrationTest;
+import org.springframework.data.crate.core.mapping.event.LifecycleEventConfigurationBase;
+import org.springframework.data.crate.core.mapping.event.SimpleMappingEventListener;
+import org.springframework.data.crate.core.mapping.event.User;
 import org.springframework.data.crate.core.CrateOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -40,9 +42,9 @@ import java.util.Locale;
  * @since 1.0.0
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes={AbstractCrateEventListenerTest.TestConfiguration.class})
+@ContextConfiguration(classes={AbstractCrateEventListenerIntegrationTest.TestConfiguration.class})
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
-public class AbstractCrateEventListenerTest extends CrateIntegrationTest {
+public class AbstractCrateEventListenerIntegrationTest extends CrateBaseIntegrationTest {
 
 	@Autowired
 	private CrateOperations crateOperations;
