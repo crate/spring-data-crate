@@ -4,8 +4,6 @@ import io.crate.testing.CrateTestCluster;
 import io.crate.testing.CrateTestServer;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,6 +12,10 @@ import java.util.regex.Pattern;
 public class CrateIntegrationTest {
 
     private static final String CRATE_SERVER_VERSION = clientVersion();
+    @ClassRule
+    public static CrateTestCluster testCluster = CrateTestCluster.fromVersion(CRATE_SERVER_VERSION)
+            .keepWorkingDir(false)
+            .build();
     protected static CrateTestServer server;
 
     private static String clientVersion() {
@@ -26,11 +28,6 @@ public class CrateIntegrationTest {
         }
         throw new RuntimeException("unable to get version of crate-client");
     }
-
-    @ClassRule
-    public static CrateTestCluster testCluster = CrateTestCluster.fromVersion(CRATE_SERVER_VERSION)
-            .keepWorkingDir(false)
-            .build();
 
     @BeforeClass
     public static void beforeClass() {
