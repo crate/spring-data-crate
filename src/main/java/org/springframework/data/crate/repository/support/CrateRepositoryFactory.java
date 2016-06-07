@@ -16,19 +16,16 @@
 package org.springframework.data.crate.repository.support;
 
 import org.springframework.data.crate.core.CrateOperations;
-import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.crate.query.CrateQueryLookupStrategyFactory;
 import org.springframework.data.querydsl.QueryDslPredicateExecutor;
-import org.springframework.data.repository.core.NamedQueries;
 import org.springframework.data.repository.core.RepositoryInformation;
 import org.springframework.data.repository.core.RepositoryMetadata;
 import org.springframework.data.repository.core.support.RepositoryFactorySupport;
 import org.springframework.data.repository.query.EvaluationContextProvider;
 import org.springframework.data.repository.query.QueryLookupStrategy;
-import org.springframework.data.repository.query.RepositoryQuery;
 import org.springframework.util.Assert;
 
 import java.io.Serializable;
-import java.lang.reflect.Method;
 
 import static org.springframework.data.querydsl.QueryDslUtils.QUERY_DSL_PRESENT;
 
@@ -72,16 +69,9 @@ public class CrateRepositoryFactory extends RepositoryFactorySupport {
     }
 
     @Override
-    protected QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key, EvaluationContextProvider evaluationContextProvider) {
-        return new CrateQueryLookupStrategy();
+    protected QueryLookupStrategy getQueryLookupStrategy(QueryLookupStrategy.Key key,
+                                                         EvaluationContextProvider evaluationContextProvider) {
+        return CrateQueryLookupStrategyFactory.create(crateOperations, key, evaluationContextProvider);
     }
 
-    private class CrateQueryLookupStrategy implements QueryLookupStrategy {
-
-        @Override
-        public RepositoryQuery resolveQuery(Method method, RepositoryMetadata repositoryMetadata, ProjectionFactory projectionFactory, NamedQueries namedQueries) {
-            //TODO: implement this method
-            return null;
-        }
-    }
 }
