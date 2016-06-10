@@ -21,16 +21,28 @@
 
 package org.springframework.data.crate.query;
 
-public class SelectMethodQuery implements MethodQuery {
+import com.google.common.base.Optional;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.data.crate.annotations.Query;
+import org.springframework.data.projection.ProjectionFactory;
+import org.springframework.data.repository.core.RepositoryMetadata;
+import org.springframework.data.repository.query.QueryMethod;
+import org.springframework.util.StringUtils;
 
-    private final PartialMethodQuery where;
+import java.lang.reflect.Method;
 
-    public SelectMethodQuery(PartialMethodQuery where) {
-        this.where = where;
+public class CrateQueryMethod extends QueryMethod {
+
+    private final Query query;
+
+    public CrateQueryMethod(Method method, RepositoryMetadata metadata, ProjectionFactory factory) {
+        super(method, metadata, factory);
+        this.query = method.getAnnotation(Query.class);
     }
 
-    @Override
-    public StringBuilder buildSQLString() {
-        return null;
+    public Optional<String> getAnnotatedQuery() {
+        String value = String.valueOf(AnnotationUtils.getValue(query, "value"));
+        return StringUtils.hasText(value) ? Optional.of(value) : Optional.<String>absent();
     }
+
 }

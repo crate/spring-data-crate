@@ -21,6 +21,6 @@
 
 package org.springframework.data.crate.query;
 
-public abstract class PartialMethodQuery implements MethodQuery {
+abstract class PartialQuery implements MethodQuery {
 
 }
