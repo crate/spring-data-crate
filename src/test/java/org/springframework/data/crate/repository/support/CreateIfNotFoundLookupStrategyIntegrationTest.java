@@ -39,13 +39,12 @@ import java.util.Locale;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertThat;
 import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = {CreateLookupStrategyIntegrationTest.TestConfig.class})
-public class CreateLookupStrategyIntegrationTest extends CrateIntegrationTest {
+@ContextConfiguration(classes = {CreateIfNotFoundLookupStrategyIntegrationTest.TestConfig.class})
+public class CreateIfNotFoundLookupStrategyIntegrationTest extends CrateIntegrationTest {
 
     @Autowired
     private CustomPersonCrateRepository repository;
@@ -54,11 +53,7 @@ public class CreateLookupStrategyIntegrationTest extends CrateIntegrationTest {
     public void setup() throws InterruptedException {
         List<Person> persons = asList(
                 new Person("person11@test.com", "person1", 25),
-                new Person("person12@test.com", "person1", 27),
-                new Person("person2@test.com", "person2", 40),
-                new Person("person3@test.com", "person3", 34),
-                new Person("person4@test.com", "person4", 21),
-                new Person("person5@test.com", "person5", 50)
+                new Person("person12@test.com", "person2", 27)
         );
         repository.save(persons);
         repository.refreshTable();
@@ -70,46 +65,16 @@ public class CreateLookupStrategyIntegrationTest extends CrateIntegrationTest {
     }
 
     @Test
-    public void testSimpleCollectionQuery() {
+    public void testFailOnUsingDeclaredQueryAndUseCreateLookupStrategy() {
         List<Person> persons = repository.findByName("person1");
-        assertThat(persons.size(), is(2));
-        assertThat(persons.get(0).getEmail(), not(persons.get(1).getEmail()));
-    }
-
-    @Test
-    public void testSimpleNotCollectionQuery() {
-        Person person = repository.getByEmail("person5@test.com");
-        assertThat(person.getAge(), is(50));
-    }
-
-    @Test
-    public void testCollectionQueryWithAnd() {
-        Person persons = repository.getByNameAndEmail("person3", "person3@test.com");
-        assertThat(persons.getAge(), is(34));
-    }
-
-    @Test
-    public void testCollectionQueryWithOr() {
-        List<Person> persons = repository.findByNameOrAge("person3", 25);
-        assertThat(persons.size(), is(2));
-    }
-
-    @Test
-    public void testCollectionQueryStartingWith() {
-        List<Person> persons = repository.findByNameStartingWith("person1");
-        assertThat(persons.size(), is(2));
-    }
-
-    @Test
-    public void testCollectionQueryGreaterThanEqual() {
-        List<Person> persons = repository.findByAgeGreaterThanEqual(34);
-        assertThat(persons.size(), is(3));
+        assertThat(persons.size(), is(1));
+        assertThat(persons.get(0).getEmail(), is("person11@test.com"));
     }
 
     @Configuration
     @EnableCrateRepositories(
             basePackages = "org.springframework.data.sample.repositories.custom",
-            queryLookupStrategy = QueryLookupStrategy.Key.CREATE)
+            queryLookupStrategy = QueryLookupStrategy.Key.CREATE_IF_NOT_FOUND)
     static class TestConfig extends TestCrateConfiguration {
 
         @Bean

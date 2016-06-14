@@ -19,17 +19,21 @@ package org.springframework.data.crate.repository.support;
 import io.crate.client.CrateClient;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.crate.CrateIntegrationTest;
 import org.springframework.data.crate.config.TestCrateConfiguration;
+import org.springframework.data.crate.core.mapping.schema.CratePersistentEntitySchemaManager;
+import org.springframework.data.crate.repository.CrateRepository;
 import org.springframework.data.crate.repository.config.EnableCrateRepositories;
 import org.springframework.data.repository.query.QueryLookupStrategy;
 import org.springframework.data.sample.entities.person.Person;
-import org.springframework.data.sample.repositories.PersonRepository;
+import org.springframework.data.sample.repositories.annotated.PersonRepository;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -39,6 +43,7 @@ import java.util.Locale;
 import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
+import static org.springframework.data.crate.core.mapping.schema.SchemaExportOption.CREATE_DROP;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = {UseDeclaredQueryLookupStrategyIntegrationTest.TestConfig.class})
@@ -75,13 +80,18 @@ public class UseDeclaredQueryLookupStrategyIntegrationTest extends CrateIntegrat
     }
 
     @Configuration
-    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories",
+    @EnableCrateRepositories(basePackages = "org.springframework.data.sample.repositories.annotated",
             queryLookupStrategy = QueryLookupStrategy.Key.USE_DECLARED_QUERY)
     static class TestConfig extends TestCrateConfiguration {
 
         @Bean
         public CrateClient crateClient() {
             return new CrateClient(String.format(Locale.ENGLISH, "%s:%d", server.crateHost(), server.transportPort()));
+        }
+
+        @Bean
+        public CratePersistentEntitySchemaManager cratePersistentEntitySchemaManager() throws Exception {
+            return new CratePersistentEntitySchemaManager(crateTemplate(), CREATE_DROP);
         }
 
         @Override
